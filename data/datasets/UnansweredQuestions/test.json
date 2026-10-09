@@ -1,0 +1,4 @@
+{"rag_questions": [
+  {"question_id": "q1", "question": "How to configure the OpenAI server?"},
+  {"question_id": "q2", "question": "What is vLLM?"}
+]}

@@ -9,13 +9,16 @@ IOU_THRESHOLD = 0.05
 
 def iou(a: MinimalSource, b: MinimalSource) -> float:
     """Intersection over union of two ranges in the same file."""
-    inter = (min(a.last_character_index, b.last_character_index)
-             - max(a.first_character_index, b.first_character_index))
+    inter = min(a.last_character_index, b.last_character_index) - max(
+        a.first_character_index, b.first_character_index
+    )
     if inter <= 0:
         return 0.0
-    union = ((a.last_character_index - a.first_character_index)
-             + (b.last_character_index - b.first_character_index)
-             - inter)
+    union = (
+        (a.last_character_index - a.first_character_index)
+        + (b.last_character_index - b.first_character_index)
+        - inter
+    )
     return inter / union if union > 0 else 0.0
 
 

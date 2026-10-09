@@ -15,8 +15,9 @@ B = 0.75
 class Retriever:
     """Rank chunks for a query using BM25."""
 
-    def __init__(self, chunks: List[Chunk], postings: Postings,
-                 lengths: List[int]) -> None:
+    def __init__(
+        self, chunks: List[Chunk], postings: Postings, lengths: List[int]
+    ) -> None:
         """Store the index and precompute the average length."""
         self.chunks = chunks
         self.postings = postings
@@ -41,8 +42,7 @@ class Retriever:
                 continue
             idf = self.idf(word)
             for chunk_id, tf in plist:
-                norm = K1 * (1 - B + B * self.lengths[chunk_id]
-                             / self.avg_len)
+                norm = K1 * (1 - B + B * self.lengths[chunk_id] / self.avg_len)
                 part = tf * (K1 + 1) / (tf + norm)
                 scores[chunk_id] = scores.get(chunk_id, 0.0) + idf * part
         best = sorted(scores, key=lambda i: scores[i], reverse=True)[:k]

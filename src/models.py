@@ -1,4 +1,3 @@
-
 """Pydantic data models exchanged between the RAG pipeline stages."""
 
 import uuid

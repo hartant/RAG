@@ -47,8 +47,7 @@ def python_cuts(text: str) -> List[int]:
     offsets = line_offsets(text)
     cuts: List[int] = []
     for node in ast.walk(tree):
-        if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef,
-                             ast.ClassDef)):
+        if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)):
             first_line = node.lineno
             for deco in node.decorator_list:
                 first_line = min(first_line, deco.lineno)
@@ -93,8 +92,7 @@ def markdown_spans(text: str, max_size: int) -> List[Span]:
     return spans
 
 
-def chunk_file(file_path: str, text: str, max_size: int = 2000
-               ) -> List[Chunk]:
+def chunk_file(file_path: str, text: str, max_size: int = 2000) -> List[Chunk]:
     """Split one file into chunks, picking the strategy by extension."""
     if file_path.endswith(".py"):
         spans = pack(text, python_cuts(text), max_size)
@@ -104,10 +102,12 @@ def chunk_file(file_path: str, text: str, max_size: int = 2000
     for first, last in spans:
         piece = text[first:last]
         if piece.strip():
-            chunks.append(Chunk(
-                file_path=file_path,
-                first_character_index=first,
-                last_character_index=last,
-                text=piece,
-            ))
+            chunks.append(
+                Chunk(
+                    file_path=file_path,
+                    first_character_index=first,
+                    last_character_index=last,
+                    text=piece,
+                )
+            )
     return chunks
