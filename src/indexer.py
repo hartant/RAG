@@ -86,7 +86,8 @@ def load_index(
     with open(base / "postings.json", encoding="utf-8") as f:
         raw = json.load(f)
     postings: Postings = {
-        word: [(int(i), int(tf)) for i, tf in plist] for word, plist in raw.items()
+        word: [(int(i), int(tf)) for i, tf in plist]
+        for word, plist in raw.items()
     }
     with open(base / "lengths.json", encoding="utf-8") as f:
         lengths: List[int] = json.load(f)

@@ -47,7 +47,10 @@ def python_cuts(text: str) -> List[int]:
     offsets = line_offsets(text)
     cuts: List[int] = []
     for node in ast.walk(tree):
-        if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)):
+        if isinstance(
+            node,
+            (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef),
+        ):
             first_line = node.lineno
             for deco in node.decorator_list:
                 first_line = min(first_line, deco.lineno)

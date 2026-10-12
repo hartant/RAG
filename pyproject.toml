@@ -19,3 +19,7 @@ dev = [
     "pytest>=9.1.1",
     "types-tqdm>=4.70.0.20260906",
 ]
+
+[[tool.mypy.overrides]]
+module = ["fire", "fire.*"]
+ignore_missing_imports = true

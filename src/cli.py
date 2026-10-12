@@ -68,8 +68,8 @@ class Cli:
         if not str(query).strip():
             print("Error: the query is empty.")
             return
-        if k <= 0:
-            print("Error: k must be greater than 0.")
+        if not isinstance(k, int) or k <= 0:
+            print("Error: k must be a positive integer.")
             return
         retriever = self._load(index_dir)
         if retriever is None:
@@ -89,8 +89,8 @@ class Cli:
         index_dir: str = PROCESSED_DIR,
     ) -> None:
         """Run the search on every question of a dataset."""
-        if k <= 0:
-            print("Error: k must be greater than 0.")
+        if not isinstance(k, int) or k <= 0:
+            print("Error: k must be a positive integer.")
             return
         try:
             with open(dataset_path, encoding="utf-8") as f:
@@ -164,8 +164,8 @@ class Cli:
         if not str(query).strip():
             print("Error: the query is empty.")
             return
-        if k <= 0:
-            print("Error: k must be greater than 0.")
+        if not isinstance(k, int) or k <= 0:
+            print("Error: k must be a positive integer.")
             return
         retriever = self._load(index_dir)
         if retriever is None:
