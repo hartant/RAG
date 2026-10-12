@@ -28,7 +28,11 @@ class Cli:
         index_dir: str = PROCESSED_DIR,
     ) -> None:
         """Chunk every file under raw_dir and save the index."""
-        if max_chunk_size <= 0 or max_chunk_size > 2000:
+        if (
+            not isinstance(max_chunk_size, int)
+            or max_chunk_size <= 0
+            or max_chunk_size > 2000
+        ):
             print("Error: max_chunk_size must be between 1 and 2000.")
             return
         paths = collect_files(raw_dir)
