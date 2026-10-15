@@ -1,36 +1,59 @@
+*This project has been created as part of the 42 curriculum by mbenamar.*
+
 # RAG against the machine
+
+## Description
 
 A small Retrieval-Augmented Generation (RAG) system that answers questions about
 the **vLLM 0.10.1** documentation and source code. It indexes `.py` and `.md`
 files, retrieves the most relevant pieces with **BM25**, and generates a grounded
 answer with **Qwen3-0.6B**.
 
+Goal: given a question about vLLM, find the right pieces of the documentation
+or source code (retrieval, measured with Recall@k), then let a small language
+model answer using only those pieces (generation).
+
+## Instructions
+
+Requirements: Python 3.10+ and [uv](https://docs.astral.sh/uv/).
+
+```bash
+make install                                   # uv sync
+# put the vLLM 0.10.1 sources in data/raw/ and the datasets in data/datasets/
+uv run python -m src index --max_chunk_size 2000
+uv run python -m src search "How to configure OpenAI server?" --k 10
+uv run python -m src answer "How to configure OpenAI server?" --k 10
+make lint                                      # flake8 + mypy
+```
+
+See section 6 for the full list of commands.
+
 ## 1. System architecture
 
 ```
- data/raw/vllm-0.10.1/         raw .py and .md files
-        |
-        v
-  [collect + read]   src/indexer.py     list files, read text
-        |
-        v
-  [chunking]         src/chunker.py     pieces of at most 2000 characters
-        |
-        v
-  [tokenizer]        src/tokenizer.py   same rule for index and query
-        |
-        v
-  [inverted index]   src/indexer.py     data/processed/*.json
-        |
-        |  question
-        v
-  [BM25 retriever]   src/retriever.py   top-k (file, first char, last char)
-        |
-        v
-  [context builder]  src/generator.py   re-reads the text from disk (12000 chars max)
-        |
-        v
-  [Qwen3-0.6B]       src/generator.py   greedy answer, 256 new tokens max
+data/raw/vllm-0.10.1/                       raw .py and .md files
+  |
+  v
+[collect + read]          src/indexer.py    list files, read text
+  |
+  v
+[chunking]                src/chunker.py    pieces of at most 2000 characters
+  |
+  v
+[tokenizer]               src/tokenizer.py  same rule for index and query
+  |
+  v
+[inverted index]          src/indexer.py    data/processed/*.json
+  |
+  |  question
+  v
+[BM25 retriever]          src/retriever.py  top-k (file, first char, last char)
+  |
+  v
+[context builder]         src/generator.py  re-reads the text from disk (12000 chars max)
+  |
+  v
+[Qwen3-0.6B]              src/generator.py  greedy answer, 256 new tokens max
 ```
 
 | Component | File | Role |
@@ -190,3 +213,27 @@ model is limited to 12000 characters.
 Empty query, `k` that is not a positive integer, missing or invalid dataset file,
 missing index (a message asks to run `index` first), and unreadable files during
 indexing (skipped).
+
+## 7. Challenges faced
+
+* **Right chunk found, but not ranked first.** BM25 counts words, not meaning:
+  a short chunk with many query words can beat the real answer page. We kept
+  the algorithm and documented the limit; Recall@10 stays high.
+* **Natural questions versus code identifiers.** Identifiers are indexed both
+  whole and split on `_`, which improved code recall.
+* **Context budget for a 0.6B model.** The context is capped at 12000
+  characters, chunks are re-read from the files and cut when the budget is full.
+* **Robustness.** Empty query, `k=0`, missing files and malformed JSON all give
+  a clear error message instead of a traceback.
+
+## 8. Resources
+
+* vLLM documentation: https://docs.vllm.ai
+* Robertson and Zaragoza, *The Probabilistic Relevance Framework: BM25 and Beyond*
+* Qwen3 model card: https://huggingface.co/Qwen/Qwen3-0.6B
+* Python Fire, pydantic, tqdm and uv documentation
+
+**Use of AI.** AI (Claude) was used as a tutor to explain concepts (BM25, IoU,
+chat templates, tokenization), to review the code, and to help with lint fixes
+and the README structure. The design and the code were written, run and
+understood by the author.
