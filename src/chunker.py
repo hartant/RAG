@@ -72,27 +72,9 @@ def markdown_header_cuts(text: str) -> List[int]:
     return cuts
 
 
-def blank_line_cuts(text: str) -> List[int]:
-    """Offsets just after each blank line (paragraph breaks)."""
-    cuts: List[int] = []
-    idx = text.find("\n\n")
-    while idx != -1:
-        cuts.append(idx + 2)
-        idx = text.find("\n\n", idx + 2)
-    return cuts
-
-
 def markdown_spans(text: str, max_size: int) -> List[Span]:
-    """Cut on headers first, then on paragraphs for oversized parts."""
-    spans: List[Span] = []
-    for start, end in pack(text, markdown_header_cuts(text), max_size):
-        part = text[start:end]
-        if len(part) <= max_size:
-            spans.append((start, end))
-            continue
-        for s, e in pack(part, blank_line_cuts(part), max_size):
-            spans.append((start + s, start + e))
-    return spans
+    """Cut on headers, then pack pieces up to max_size."""
+    return pack(text, markdown_header_cuts(text), max_size)
 
 
 def chunk_file(file_path: str, text: str, max_size: int = 2000) -> List[Chunk]:
